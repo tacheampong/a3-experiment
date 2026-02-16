@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Team Score Pie Chart</title>
+    <title>Team Score Pie Chart - BW</title>
 </head>
 <body>
 <div id="container"></div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script type="module">
 
-    // 1. Setup dimensions
     const width = 500;
     const height = 500;
     const radius = Math.min(width, height) / 2 - 40;
@@ -18,25 +17,19 @@
         {team: "B", score: 10}
     ];
 
-    // 2. Set up Color Scale
-    const color = d3.scaleOrdinal()
-        .domain(data.map(d => d.team))
-        .range(d3.schemeCategory10);
-
-    // 3. Create Pie and Arc Generators
+    // Create Pie and Arc Generators
     const pie = d3.pie()
         .value(d => d.score)
-        .sort(null); // Keeps the order of the data array
+        .sort(null); 
 
     const arc = d3.arc()
-        .innerRadius(0) // Set this > 0 for a donut chart
+        .innerRadius(0)
         .outerRadius(radius);
 
     const labelArc = d3.arc()
         .innerRadius(radius - 40)
         .outerRadius(radius - 40);
 
-    // 4. Create SVG
     const svg = d3.select("#container")
         .append("svg")
         .attr("width", width)
@@ -44,7 +37,7 @@
         .append("g")
         .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
-    // 5. Draw the Slices
+    // Draw the Slices in Grayscale
     const arcs = svg.selectAll("arc")
         .data(pie(data))
         .enter()
@@ -52,25 +45,30 @@
 
     arcs.append("path")
         .attr("d", arc)
-        .attr("fill", d => color(d.data.team))
-        .attr("stroke", "white")
+        // Set Team A to Light Gray and Team B to Dark Gray/Black for contrast
+        .attr("fill", (d, i) => i === 0 ? "#eeeeee" : "#333333") 
+        .attr("stroke", "black")
         .style("stroke-width", "2px");
 
-    // 6. Add Labels
+    // Add Labels with inverted colors for legibility
     arcs.append("text")
         .attr("transform", d => `translate(${labelArc.centroid(d)})`)
         .attr("text-anchor", "middle")
-        .attr("fill", "white")
+        // Black text on light slice, White text on dark slice
+        .attr("fill", (d, i) => i === 0 ? "black" : "white") 
         .style("font-size", "16px")
+        .style("font-family", "sans-serif")
         .style("font-weight", "bold")
         .text(d => d.data.team);
 
-    // 7. Add Title
+    // Title
     svg.append("text")
         .attr("x", 0)
-        .attr("y", -radius - 10)
+        .attr("y", -radius - 15)
         .attr("text-anchor", "middle")
+        .attr("fill", "black")
         .style("font-size", "20px")
+        .style("font-family", "sans-serif")
         .text("Team Scores");
 
 </script>
